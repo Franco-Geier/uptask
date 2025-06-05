@@ -1,0 +1,19 @@
+{
+    "name": "francogeier/uptask",
+    "description": "Proyecto UpTask MVC, PHP 8, SASS",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Franco-geier",
+            "email": "francoyogeier@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "MVC\\" : "./",
+            "Controllers\\" : "./controllers",
+            "Model\\" : "./models"
+        }
+    }
+}

@@ -1,0 +1,30 @@
+@use 'variables' as v;
+html {
+    font-size: 62.5%;
+    height: 100%;
+}
+body {
+    font-family: v.$fuente_textos;
+    font-size: 1.6rem;
+    min-height: 100%;
+}
+.contenedor {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.contenedor-sm {
+    max-width: 70rem;
+    margin: 0 auto;
+}
+a {
+    text-decoration: none;
+    font-size: clamp(1.55rem, 0.341vw + 1.441rem, 1.85rem);
+}
+img,
+picture {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    display: block;
+}
