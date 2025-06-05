@@ -1,25 +1,30 @@
 <?php
 namespace Controllers;
+use MVC\Router;
 
 class LoginController {
-    public static function login() {
-        echo "Desde Login";
-
+    public static function login(Router $router) {
         if($_SERVER["REQUEST_METHOD"] === "POST") {
             
         }
+
+        $router->render("auth/login", [
+            "tittle" => "Iniciar Sesión"
+        ]);
     }
 
     public static function logout() {
         echo "Desde Logout";
     }
 
-    public static function create() {
-        echo "Desde Create";
-
+    public static function create(Router $router) {
         if($_SERVER["REQUEST_METHOD"] === "POST") {
             
         }
+
+        $router->render("auth/create", [
+            "tittle" => "Crea tu cuenta en UpTask"
+        ]);
     }
 
     public static function forgot() {

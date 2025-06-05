@@ -1,5 +1,5 @@
 import pkg from 'gulp';
-const { src, dest, watch, parallel } = pkg;
+const { src, dest, watch, parallel, series } = pkg;
 
 // css
 import * as dartSass from "sass";
@@ -28,15 +28,14 @@ const paths = {
     images: "src/img/**/*.{jpg,png}",
 }
 
-
 function css() {
     return src(paths.scss) // Identificar el archivo SASS
+        .pipe(plumber({ errorHandler: handleError }))  // Manejo de errores con función personalizada
         .pipe(sourcemaps.init())
-        .pipe(plumber())  // Prevenir que se detenga en caso de error
         .pipe(sass()) // Compilar SASS a CSS
         .pipe(postcss([autoprefixer(), cssnano()]))
         .pipe(sourcemaps.write("."))
-        .pipe(dest("build/css")); // Almacenar en la carpeta build
+        .pipe(dest("./public/build/css")); // Almacenar en la carpeta build
 }
 
 function javascript() {
@@ -46,32 +45,36 @@ function javascript() {
         .pipe(terser())
         .pipe(sourcemaps.write("."))
         .pipe(rename({ suffix: ".min" }))
-        .pipe(dest("build/js"));
+        .pipe(dest("./public/build/js"));
 }
 
 function images() {
     return src(paths.images)
-        .pipe(newer("build/img")) // Solo pasa las nuevas o modificadas
+        .pipe(newer("./public/build/img")) // Solo pasa las nuevas o modificadas
         .pipe(imagemin([
             mozjpeg({ quality: 65, progressive: true }),
 	        optipng({ optimizationLevel: 3 }),
         ]))
-        .pipe(dest("build/img"));
+        .pipe(dest("./public/build/img"));
 }
 
 function webpVersion() {
     return src(paths.images)
-        .pipe(newer("build/img"))
+        .pipe(newer("./public/build/img"))
         .pipe(webp({ quality: 50 }))
-        .pipe(dest('build/img'));
+        .pipe(dest("./public/build/img"));
 }
-
 
 function avifVersion() {
     return src(paths.images)
-        .pipe(newer("build/img"))
+        .pipe(newer("./public/build/img"))
         .pipe(avif({ quality: 50 }))
-        .pipe(dest('build/img'));
+        .pipe(dest("./public/build/img"));
+}
+
+function handleError(error) {
+    console.error('Error en Gulp:', error.toString());
+    this.emit('end');  // Permite que Gulp continúe
 }
 
 function dev() {
@@ -80,6 +83,7 @@ function dev() {
 }
 
 const processImages = parallel(images, webpVersion, avifVersion);
+const devTasks = series(css, javascript, dev);
 
 export { css };
 export { javascript as js };
@@ -87,4 +91,4 @@ export { images };
 export { webpVersion };
 export { avifVersion };
 export { processImages };
-export { dev };
+export { devTasks as dev };
