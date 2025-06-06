@@ -13,14 +13,12 @@
 
     interface ActiveRecordInterface {
         public function validar(): array;
-        public function guardar(): bool;
+        public function save(): bool;
         public function actualizar(): bool;
         public function crear(): bool;
         public function eliminar(): bool;
-        public function sincronizar(array $args): void;
+        public function sincronize(array $args): void;
         public function cleanAtributes(): array;
-        public function setImage(string $imagen): void;
-        public function deleteImage(): void;
     }
 
     abstract class ActiveRecord implements ActiveRecordInterface {
@@ -40,11 +38,11 @@
             self::$db = $database;
         }
 
-        public static function setAlert($type, $message): void {
+        public static function setAlert(string $type, string $message): void {
             static::$alerts[$type][] = $message;
         }
 
-        // Validación
+        // Obtener las alertas
         public static function getAlerts(): array {
             return static::$alerts;
         }
@@ -173,7 +171,7 @@
         }
 
 
-        public function guardar(): bool {
+        public function save(): bool {
             if(!is_null($this->id)) { // Si ya hay un Id
                 return $this->actualizar(); // Actualizar
             } else {
@@ -228,7 +226,7 @@
 
         
         // Sincroniza el objeto en memoria con los cambios realizados por el usuario
-        public function sincronizar($args = []): void {
+        public function sincronize($args = []): void {
             foreach($args as $key => $value) {
                 if(property_exists($this, $key) && !is_null($value)) {
                     $this->$key = $value;
@@ -242,10 +240,6 @@
             $query = "DELETE FROM " . static::$table . " WHERE id = :id LIMIT 1";
             $stmt = self::$db->prepare($query);
             $resultado = $stmt->execute(['id' => $this->id]);
-        
-            if ($resultado) {
-                $this->deleteImage();
-            }
             return $resultado;
         }
 
