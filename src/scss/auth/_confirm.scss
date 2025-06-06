@@ -1,0 +1,20 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+@use "sass:color";
+
+.confirm {
+    margin-top: 5rem;
+
+    .uptask {
+        @include m.degradedText(v.$indigo);
+    }
+
+    .actions {
+        justify-content: center;
+        align-items: center;
+        
+        a {
+            color: v.$indigo;
+        }
+    }
+}

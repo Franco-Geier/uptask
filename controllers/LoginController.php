@@ -37,19 +37,25 @@ class LoginController {
         ]);
     }
 
-    public static function restore() {
-        echo "Desde restore";
-
+    public static function restore(Router $router) {
         if($_SERVER["REQUEST_METHOD"] === "POST") {
             
         }
+
+        $router->render("auth/restore", [
+            "tittle" => "Restablecer Password"
+        ]);
     }
 
-    public static function message() {
-        echo "Desde message";
+    public static function message(Router $router) {
+        $router->render("auth/message", [
+            "tittle" => "Cuenta Creada Exitosamente" 
+        ]);
     }
 
-    public static function confirm() {
-        echo "Desde confirm";
+    public static function confirm(Router $router) {
+        $router->render("auth/confirm", [
+            "tittle" => "Confirma tu Cuenta Uptask"
+        ]);
     }
 }

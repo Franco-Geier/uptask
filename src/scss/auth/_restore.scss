@@ -1,0 +1,21 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+@use "sass:color";
+
+.restore {
+    margin-top: 5rem;
+
+    .uptask {
+        @include m.degradedText(v.$blue);
+    }
+
+    input[type="submit"] {
+        @include m.button(v.$blue, v.$white);
+    }
+
+    .actions {
+        a {
+            color: v.$blue;
+        }
+    }
+}
