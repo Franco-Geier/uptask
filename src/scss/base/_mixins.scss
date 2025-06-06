@@ -47,3 +47,11 @@
         gap: $gap;
     }
 }
+
+@mixin degradedText($color) {
+    background: linear-gradient(to right, $color 0%, color.adjust($color, $lightness: 35%) 100%);
+    color: transparent;
+    background-clip: text;
+    text-align: center;
+    font-size: clamp(7rem, 3.409vw + 5.909rem, 10rem);
+}

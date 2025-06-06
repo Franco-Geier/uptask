@@ -1,12 +1,13 @@
 @use 'variables' as v;
 html {
     font-size: 62.5%;
-    height: 100%;
 }
 body {
     font-family: v.$texts_font;
     font-size: 1.6rem;
-    min-height: 100%;
+    display: grid;
+    min-height: 100dvh;
+    grid-template-rows: auto 1fr auto;
 }
 .container {
     width: 95%;

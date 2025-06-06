@@ -27,12 +27,14 @@ class LoginController {
         ]);
     }
 
-    public static function forgot() {
-        echo "Desde Forgot";
-
+    public static function forgot(Router $router) {
         if($_SERVER["REQUEST_METHOD"] === "POST") {
             
         }
+
+        $router->render("auth/forgot", [
+            "tittle" => "Olvide mi Password"
+        ]);
     }
 
     public static function restore() {
