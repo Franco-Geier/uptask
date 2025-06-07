@@ -36,7 +36,6 @@ class LoginController {
                     $alerts = User::getAlerts();
                 } else {
                     $user->hashPassword(); // Hashear password
-                    unset($user->password2); // Eliminar password2
                     $user->createToken(); // Generar el token
                     $result = $user->save(); // Guardar el nuevo usuario
                     $email = new Email($user->email, $user->name, $user->token); // Crear el objeto email
@@ -66,7 +65,6 @@ class LoginController {
             
                 if($user && $user->confirmed) {
                     $user->createToken();
-                    unset($user->password2);
                     $user->save();
                     $email = new Email($user->email, $user->name, $user->token);
                     $email->sendInstructions();
@@ -86,12 +84,37 @@ class LoginController {
     }
 
     public static function restore(Router $router) {
-        if($_SERVER["REQUEST_METHOD"] === "POST") {
-            
+        $token = s($_GET["token"]);
+        $show = TRUE;
+        if(!$token) header("Location: /");
+        $user = User::where("token", $token);
+
+        if(!$user) {
+            user::setAlert("error", "Token no válido");
+            $show = FALSE;
         }
 
+        if($_SERVER["REQUEST_METHOD"] === "POST") {
+            $user->sincronize($_POST);
+            $alerts = $user->validatePassword(); // Validar password
+        
+            if(empty($alerts)) {
+                $user->hashPassword();
+                $user->token = "";
+                $result = $user->save();
+
+                if($result) {
+                    header("Location: /");
+                }
+            }
+        }
+
+        $alerts = User::getAlerts();
+
         $router->render("auth/restore", [
-            "tittle" => "Restablecer Password"
+            "tittle" => "Restablecer Password",
+            "alerts" => $alerts,
+            "show" => $show
         ]);
     }
 
@@ -111,9 +134,8 @@ class LoginController {
         } else {
             $user->confirmed = 1; // Confirmar la cuenta
             $user->token = "";
-            unset($user->password2);
             $user->save(); // Guardar en la BD
-            user::setAlert("exito", "Cueta confirmada correctamente");
+            user::setAlert("exito", "Cuenta confirmada correctamente");
         }
 
         $alerts = User::getAlerts();

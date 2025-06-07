@@ -32,18 +32,7 @@ class User extends ActiveRecord {
         }
     }
 
-    // Validación para cuentas nuevas
-    public function validateNewAccount() {
-        if (!$this->name) {
-            self::$alerts["error"][] = "El nombre del usuario es obligatorio";
-        } elseif (!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
-            self::$alerts["error"][] = "El nombre solo puede contener letras, números, espacios, apóstrofes y guiones.";
-        } elseif (mb_strlen($this->name) > 30) {
-            self::$alerts["error"][] = "El nombre debe tener hasta 30 caracteres.";
-        }
-
-        $this->validateEmailLogic();
-
+    protected function validatePasswordLogic(): void {
         if (!$this->password) {
             self::$alerts["error"][] = "El password no puede ir vacío";
         } elseif (mb_strlen($this->password) < 6) {
@@ -64,6 +53,22 @@ class User extends ActiveRecord {
                 self::$alerts["error"][] = "El password debe incluir al menos un carácter especial";
             }
         }
+    }
+
+    // Validación para cuentas nuevas
+    public function validateNewAccount() {
+        if (!$this->name) {
+            self::$alerts["error"][] = "El nombre del usuario es obligatorio";
+        } elseif (!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
+            self::$alerts["error"][] = "El nombre solo puede contener letras, números, espacios, apóstrofes y guiones.";
+        } elseif (mb_strlen($this->name) > 30) {
+            self::$alerts["error"][] = "El nombre debe tener hasta 30 caracteres.";
+        }
+
+        $this->validateEmailLogic();
+        
+        $this->validatePasswordLogic();
+        
         return self::$alerts;
     }
 
@@ -80,6 +85,12 @@ class User extends ActiveRecord {
     // Valida un email y retorna un array de alertas
     public function validateEmail(): array {
         $this->validateEmailLogic();
+        return self::$alerts;
+    }
+
+    // Valida un password y retorna un array de alertas
+    public function validatePassword(): array {
+        $this->validatePasswordLogic();
         return self::$alerts;
     }
 }

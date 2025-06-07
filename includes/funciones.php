@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-function debuguear(mixed $variable): void {
+function debug(mixed $variable): void {
     echo "<pre>";
         var_dump($variable);
     echo "</pre>";
@@ -21,8 +21,8 @@ function s(?string $html): string {
 }
 
 // Muestra los mensajes
-function mostrarNotificacion(int $codigo): string|false {
-    return match($codigo) {
+function showNotification(int $code): string|false {
+    return match($code) {
         1 => "Creado Correctamente",
         2 => "Actualizado Correctamente",
         3 => "Eliminado Correctamente",
@@ -30,7 +30,7 @@ function mostrarNotificacion(int $codigo): string|false {
     };
 }
     
-function validarORedireccionar(string $url): int {
+function validateOrRedirection(string $url): int {
     // Validar la URL por ID válido
     $id = filter_var($_GET["id"] ?? null, FILTER_VALIDATE_INT);
     if(!$id) {
