@@ -16,29 +16,33 @@ class User extends ActiveRecord {
 
     public function __construct($args = []) {
         $this->id = $args["id"] ?? null;
-        $this->name = trim($args["name"] ?? "");
-        $this->email = trim($args["email"] ?? "");
-        $this->password = trim($args["password"] ?? "");
+        $this->name = $args["name"] ?? "";
+        $this->email = $args["email"] ?? "";
+        $this->password = $args["password"] ?? "";
         $this->password2 = $args["password2"] ?? "";
         $this->token = $args["token"] ?? "";
         $this->confirmed = isset($args["confirmed"]) ? (int)$args["confirmed"] : 0;
+    }
+
+    protected function validateEmailLogic(): void {
+        if (!$this->email) {
+            self::$alerts["error"][] = "El email del usuario es obligatorio";
+        } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            self::$alerts["error"][] = "El email no es válido.";
+        }
     }
 
     // Validación para cuentas nuevas
     public function validateNewAccount() {
         if (!$this->name) {
             self::$alerts["error"][] = "El nombre del usuario es obligatorio";
-        } elseif (!preg_match("/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
-            self::$alerts["error"][] = "El nombre solo puede contener letras, espacios, apóstrofes y guiones.";
+        } elseif (!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
+            self::$alerts["error"][] = "El nombre solo puede contener letras, números, espacios, apóstrofes y guiones.";
         } elseif (mb_strlen($this->name) > 30) {
             self::$alerts["error"][] = "El nombre debe tener hasta 30 caracteres.";
         }
 
-        if (!$this->email) {
-            self::$alerts["error"][] = "El email del usuario es obligatorio";
-        } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            self::$alerts["error"][] = "El email no es válido.";
-        }
+        $this->validateEmailLogic();
 
         if (!$this->password) {
             self::$alerts["error"][] = "El password no puede ir vacío";
@@ -71,5 +75,11 @@ class User extends ActiveRecord {
     // Generar un token
     public function createToken() {
         $this->token = md5(uniqid());
+    }
+
+    // Valida un email y retorna un array de alertas
+    public function validateEmail(): array {
+        $this->validateEmailLogic();
+        return self::$alerts;
     }
 }

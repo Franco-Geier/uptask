@@ -229,12 +229,12 @@
         public function sincronize($args = []): void {
             foreach($args as $key => $value) {
                 if(property_exists($this, $key) && !is_null($value)) {
-                    $this->$key = $value;
+                    $this->$key = is_string($value) ? trim($value) : $value;
                 }
             }
         }
 
-
+        
         // Eliminar un registro
         public function eliminar(): bool {
             $query = "DELETE FROM " . static::$table . " WHERE id = :id LIMIT 1";

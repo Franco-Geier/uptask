@@ -56,12 +56,32 @@ class LoginController {
     }
 
     public static function forgot(Router $router) {
+        $alerts = [];
         if($_SERVER["REQUEST_METHOD"] === "POST") {
+            $user = new User($_POST);
+            $alerts = $user->validateEmail();
+
+            if(empty($alerts)) {
+                $user = User::where("email", $user->email); // Buscar al usuario
             
+                if($user && $user->confirmed) {
+                    $user->createToken();
+                    unset($user->password2);
+                    $user->save();
+                    $email = new Email($user->email, $user->name, $user->token);
+                    $email->sendInstructions();
+                    User::setAlert("exito", "Hemos enviado las instrucciones a tu email");
+                } else {
+                    User::setAlert("error", "El usuario no existe o no está confirmado");
+                }
+            }
         }
 
+        $alerts = User::getAlerts();
+
         $router->render("auth/forgot", [
-            "tittle" => "Olvide mi Password"
+            "tittle" => "Olvide mi Password",
+            "alerts" => $alerts
         ]);
     }
 
