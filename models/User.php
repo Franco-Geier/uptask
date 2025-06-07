@@ -24,18 +24,14 @@ class User extends ActiveRecord {
         $this->confirmed = isset($args["confirmed"]) ? (int)$args["confirmed"] : 0;
     }
 
-    protected function validateEmailLogic(): void {
-        if (!$this->email) {
-            self::$alerts["error"][] = "El email del usuario es obligatorio";
-        } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            self::$alerts["error"][] = "El email no es válido.";
+    protected function validatePasswordRequired(): void {
+        if (!$this->password) {
+            self::$alerts["error"][] = "El password no puede ir vacío";
         }
     }
 
-    protected function validatePasswordLogic(): void {
-        if (!$this->password) {
-            self::$alerts["error"][] = "El password no puede ir vacío";
-        } elseif (mb_strlen($this->password) < 6) {
+    protected function validatePasswordSecure(): void {
+        if (mb_strlen($this->password) < 6) {
             self::$alerts["error"][] = "El password debe contener al menos 6 caracteres";
         } elseif ($this->password !== $this->password2) {
             self::$alerts["error"][] = "Los passwords no coinciden";
@@ -55,6 +51,19 @@ class User extends ActiveRecord {
         }
     }
 
+    protected function validateLoginLogic(): void {
+        $this->validateEmailLogic();
+        $this->validatePasswordRequired();
+    }
+
+    protected function validateEmailLogic(): void {
+        if (!$this->email) {
+            self::$alerts["error"][] = "El email del usuario es obligatorio";
+        } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            self::$alerts["error"][] = "El email no es válido.";
+        }
+    }
+
     // Validación para cuentas nuevas
     public function validateNewAccount() {
         if (!$this->name) {
@@ -66,9 +75,28 @@ class User extends ActiveRecord {
         }
 
         $this->validateEmailLogic();
+        $this->validatePasswordRequired();
+        $this->validatePasswordSecure();
         
-        $this->validatePasswordLogic();
-        
+        return self::$alerts;
+    }
+
+    // Valida el login del usuario y retorna un array de alertas
+    public function validateLogin() {
+        $this->validateLoginLogic();
+        return self::$alerts;
+    }
+
+    // Valida un email y retorna un array de alertas
+    public function validateEmail(): array {
+        $this->validateEmailLogic();
+        return self::$alerts;
+    }
+
+    // Valida un password y retorna un array de alertas
+    public function validatePassword(): array {
+        $this->validatePasswordRequired();
+        $this->validatePasswordSecure();
         return self::$alerts;
     }
 
@@ -82,15 +110,4 @@ class User extends ActiveRecord {
         $this->token = md5(uniqid());
     }
 
-    // Valida un email y retorna un array de alertas
-    public function validateEmail(): array {
-        $this->validateEmailLogic();
-        return self::$alerts;
-    }
-
-    // Valida un password y retorna un array de alertas
-    public function validatePassword(): array {
-        $this->validatePasswordLogic();
-        return self::$alerts;
-    }
 }

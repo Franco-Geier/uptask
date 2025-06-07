@@ -7,12 +7,36 @@ use Classes\Email;
 
 class LoginController {
     public static function login(Router $router) {
+        $alerts = [];
         if($_SERVER["REQUEST_METHOD"] === "POST") {
-            
+            $user = new User($_POST);
+            $alerts = $user->validateLogin();
         }
 
+        if(empty($alerts)) {
+            $foundUser = User::where("email", $user->email);
+            
+            if(!$foundUser || !$foundUser->confirmed) {
+                User::setAlert("error", "El usuario no existe o no está confirmado");
+            } else {
+                if(password_verify($_POST["password"], $foundUser->password)) {
+                    session_start();
+                    $_SESSION["id"] = $foundUser->id;
+                    $_SESSION["name"] = $foundUser->name;
+                    $_SESSION["email"] = $foundUser->email;
+                    $_SESSION["login"] = TRUE;
+                    header("Location: /Projects");
+                } else {
+                    User::setAlert("error", "Password incorrecto");
+                }
+            }
+        }
+
+        $alerts = User::getAlerts();
+
         $router->render("auth/login", [
-            "tittle" => "Iniciar Sesión"
+            "tittle" => "Iniciar Sesión",
+            "alerts" => $alerts
         ]);
     }
 
@@ -29,9 +53,9 @@ class LoginController {
             $alerts = $user->validateNewAccount();
             
             if(empty($alerts)) {
-                $userExist = User::where("email", $user->email);
+                $foundUser = User::where("email", $user->email);
                 
-                if($userExist) {
+                if($foundUser) {
                     User::setAlert("error", "El usuario ya está registrado");
                     $alerts = User::getAlerts();
                 } else {
@@ -61,12 +85,12 @@ class LoginController {
             $alerts = $user->validateEmail();
 
             if(empty($alerts)) {
-                $user = User::where("email", $user->email); // Buscar al usuario
+                $foundUser = User::where("email", $user->email); // Buscar al usuario
             
-                if($user && $user->confirmed) {
-                    $user->createToken();
-                    $user->save();
-                    $email = new Email($user->email, $user->name, $user->token);
+                if($foundUser && $foundUser->confirmed) {
+                    $foundUser->createToken();
+                    $foundUser->save();
+                    $email = new Email($foundUser->email, $foundUser->name, $foundUser->token);
                     $email->sendInstructions();
                     User::setAlert("exito", "Hemos enviado las instrucciones a tu email");
                 } else {
