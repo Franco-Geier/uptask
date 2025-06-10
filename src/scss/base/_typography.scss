@@ -19,6 +19,10 @@ p {
     color: v.$gray;
     line-height: 1.8;
 }
+label, input {
+    font-size: clamp(1.4rem, 0.227vw + 1.327rem, 1.6rem);
+}
+
 .tagline {
     font-family: v.$headings_font;
     font-weight: 900;
