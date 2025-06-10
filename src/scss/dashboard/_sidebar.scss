@@ -1,0 +1,36 @@
+@use 'base/mixins' as m;
+@use 'base/variables' as v;
+@use "sass:color";
+
+.sidebar {
+    background-color: v.$indigo;
+    padding: 2rem;
+
+    h2 {
+        color: v.$white;
+        margin: 0;
+        text-align: center;
+    }
+
+    .sidebar-nav {
+        margin-top: 5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+
+        a {
+            color: v.$white;
+            padding: .7rem;
+            transition: background-color .3s;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: clamp(1.3rem, 0.227vw + 1.227rem, 1.5rem);
+
+            &:hover,
+            &.active {
+                background-color: color.adjust(v.$indigo, $lightness: -20%);
+                border-radius: .5rem;
+            }
+        }
+    }
+}

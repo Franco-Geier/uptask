@@ -11,23 +11,23 @@ class LoginController {
         if($_SERVER["REQUEST_METHOD"] === "POST") {
             $user = new User($_POST);
             $alerts = $user->validateLogin();
-        }
 
-        if(empty($alerts)) {
-            $foundUser = User::where("email", $user->email);
-            
-            if(!$foundUser || !$foundUser->confirmed) {
-                User::setAlert("error", "El usuario no existe o no está confirmado");
-            } else {
-                if(password_verify($_POST["password"], $foundUser->password)) {
-                    session_start();
-                    $_SESSION["id"] = $foundUser->id;
-                    $_SESSION["name"] = $foundUser->name;
-                    $_SESSION["email"] = $foundUser->email;
-                    $_SESSION["login"] = TRUE;
-                    header("Location: /Projects");
+            if(empty($alerts)) {
+                $foundUser = User::where("email", $user->email);
+                
+                if(!$foundUser || !$foundUser->confirmed) {
+                    User::setAlert("error", "El usuario no existe o no está confirmado");
                 } else {
-                    User::setAlert("error", "Password incorrecto");
+                    if(password_verify($_POST["password"], $foundUser->password)) {
+                        session_start();
+                        $_SESSION["id"] = $foundUser->id;
+                        $_SESSION["name"] = $foundUser->name;
+                        $_SESSION["email"] = $foundUser->email;
+                        $_SESSION["login"] = TRUE;
+                        header("Location: /dashboard");
+                    } else {
+                        User::setAlert("error", "Password incorrecto");
+                    }
                 }
             }
         }
@@ -41,7 +41,12 @@ class LoginController {
     }
 
     public static function logout() {
-        echo "Desde Logout";
+        session_start();
+        $_SESSION = [];
+        session_unset();
+        session_destroy();
+        setcookie(session_name(), "", time() - 3600, "/");
+        header("Location: /");
     }
 
     public static function create(Router $router) {

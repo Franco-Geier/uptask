@@ -1,0 +1,24 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+
+.dashboard {
+    background-color: v.$lightGray;
+
+    @include m.tablet {
+        display: flex;
+        height: 100dvh;
+    }
+
+    .main {
+        flex: 1;
+    }
+
+    .content {
+        padding: 2rem;
+
+        .page-name {
+            text-align: center;
+            font-size: clamp(2.5rem, 0.341vw + 2.391rem, 2.8rem);
+        }
+    }
+}
