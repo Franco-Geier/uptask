@@ -23,6 +23,10 @@ class Project extends ActiveRecord {
     public function validateProject() {
         if(!$this->project) {
             self::$alerts["error"][] = "El nombre del proyecto es obligatorio";
+        } elseif(!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->project)) {
+            self::$alerts["error"][] = "El proyecto solo puede contener letras, números, espacios, apóstrofes y guiones.";
+        } elseif(mb_strlen($this->project) > 60) {
+            self::$alerts["error"][] = "El nombre del proyecto debe tener hasta 60 caracteres";
         }
         return self::$alerts;
     }

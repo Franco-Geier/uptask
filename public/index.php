@@ -33,6 +33,7 @@ $router->get("/confirm", [LoginController::class, "confirm"]);
 $router->get("/dashboard", [DashboardController::class, "index"]);
 $router->get("/create-project", [DashboardController::class, "create_project"]);
 $router->post("/create-project", [DashboardController::class, "create_project"]);
+$router->get("/project", [DashboardController::class, "project"]);
 $router->get("/profile", [DashboardController::class, "profile"]);
 
 

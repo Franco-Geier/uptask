@@ -25,36 +25,36 @@ class User extends ActiveRecord {
     }
 
     protected function validatePasswordRequired(): void {
-        if (!$this->password) {
+        if(!$this->password) {
             self::$alerts["error"][] = "El password no puede ir vacío";
         }
     }
 
     protected function validatePasswordSecure(): void {
-        if (mb_strlen($this->password) < 8 || mb_strlen($this->password) > 128) {
+        if(mb_strlen($this->password) < 8 || mb_strlen($this->password) > 128) {
             self::$alerts["error"][] = "El password debe contener entre 8 y 128 caracteres";
-        } elseif ($this->password !== $this->password2) {
+        } elseif($this->password !== $this->password2) {
             self::$alerts["error"][] = "Los passwords no coinciden";
         } else {
-            if (!preg_match('/[A-Z]/', $this->password)) {
+            if(!preg_match('/[A-Z]/', $this->password)) {
                 self::$alerts["error"][] = "El password debe incluir al menos una letra mayúscula";
             }
-            if (!preg_match('/[a-z]/', $this->password)) {
+            if(!preg_match('/[a-z]/', $this->password)) {
                 self::$alerts["error"][] = "El password debe incluir al menos una letra minúscula";
             }
-            if (!preg_match('/[0-9]/', $this->password)) {
+            if(!preg_match('/[0-9]/', $this->password)) {
                 self::$alerts["error"][] = "El password debe incluir al menos un número";
             }
-            if (!preg_match('/[^a-zA-Z0-9]/', $this->password)) {
+            if(!preg_match('/[^a-zA-Z0-9]/', $this->password)) {
                 self::$alerts["error"][] = "El password debe incluir al menos un carácter especial";
             }
         }
     }
 
     protected function validateEmailLogic(): void {
-        if (!$this->email) {
+        if(!$this->email) {
             self::$alerts["error"][] = "El email del usuario es obligatorio";
-        } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+        } elseif(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             self::$alerts["error"][] = "El email no es válido.";
         }
     }
@@ -66,11 +66,11 @@ class User extends ActiveRecord {
 
     // Validación para cuentas nuevas
     public function validateNewAccount() {
-        if (!$this->name) {
+        if(!$this->name) {
             self::$alerts["error"][] = "El nombre del usuario es obligatorio";
-        } elseif (!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
+        } elseif(!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
             self::$alerts["error"][] = "El nombre solo puede contener letras, números, espacios, apóstrofes y guiones.";
-        } elseif (mb_strlen($this->name) > 30) {
+        } elseif(mb_strlen($this->name) > 30) {
             self::$alerts["error"][] = "El nombre debe tener hasta 30 caracteres.";
         }
 
