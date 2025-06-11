@@ -25,7 +25,7 @@ class DashboardController {
             $alerts = $project->validateProject();
 
             if(empty($alerts)) {
-                $project->url = md5(uniqid()); // Generar una URL única
+                $project->url = generateToken();
                 $project->ownerId = $_SESSION["id"]; // Almacenar al creador del proyecto
                 $project->save();
                 header("Location: /project?url={$project->url}");

@@ -18,7 +18,7 @@ class LoginController {
                 if(!$foundUser || !$foundUser->confirmed) {
                     User::setAlert("error", "El usuario no existe o no está confirmado");
                 } else {
-                    if(password_verify($_POST["password"], $foundUser->password)) {
+                    if(User::verifyPassword($_POST["password"], $foundUser->password)) {
                         session_start();
                         $_SESSION["id"] = $foundUser->id;
                         $_SESSION["name"] = $foundUser->name;
@@ -65,7 +65,7 @@ class LoginController {
                     $alerts = User::getAlerts();
                 } else {
                     $user->hashPassword(); // Hashear password
-                    $user->createToken(); // Generar el token
+                    $user->token = generateToken(); // Generar el token
                     $result = $user->save(); // Guardar el nuevo usuario
                     $email = new Email($user->email, $user->name, $user->token); // Crear el objeto email
                     $email->sendConfirmation(); // Enviar email de confirmación
@@ -93,7 +93,7 @@ class LoginController {
                 $foundUser = User::where("email", $user->email); // Buscar al usuario
             
                 if($foundUser && $foundUser->confirmed) {
-                    $foundUser->createToken();
+                    $foundUser->token = generateToken();
                     $foundUser->save();
                     $email = new Email($foundUser->email, $foundUser->name, $foundUser->token);
                     $email->sendInstructions();

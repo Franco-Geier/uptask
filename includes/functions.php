@@ -39,3 +39,8 @@ function validateOrRedirection(string $url): int {
     }
     return $id;
 }
+
+// Genera un token de 32 caracteres
+function generateToken(): string {
+    return md5(uniqid((string)rand(), true));
+}

@@ -31,8 +31,8 @@ class User extends ActiveRecord {
     }
 
     protected function validatePasswordSecure(): void {
-        if (mb_strlen($this->password) < 6) {
-            self::$alerts["error"][] = "El password debe contener al menos 6 caracteres";
+        if (mb_strlen($this->password) < 8 || mb_strlen($this->password) > 128) {
+            self::$alerts["error"][] = "El password debe contener entre 8 y 128 caracteres";
         } elseif ($this->password !== $this->password2) {
             self::$alerts["error"][] = "Los passwords no coinciden";
         } else {
@@ -51,17 +51,17 @@ class User extends ActiveRecord {
         }
     }
 
-    protected function validateLoginLogic(): void {
-        $this->validateEmailLogic();
-        $this->validatePasswordRequired();
-    }
-
     protected function validateEmailLogic(): void {
         if (!$this->email) {
             self::$alerts["error"][] = "El email del usuario es obligatorio";
         } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             self::$alerts["error"][] = "El email no es válido.";
         }
+    }
+
+    protected function validateLoginLogic(): void {
+        $this->validateEmailLogic();
+        $this->validatePasswordRequired();
     }
 
     // Validación para cuentas nuevas
@@ -100,14 +100,22 @@ class User extends ActiveRecord {
         return self::$alerts;
     }
 
-    // Hashea el password
     public function hashPassword() {
-        $this->password = password_hash($this->password, PASSWORD_BCRYPT);
+        $pepper = PEPPER;
+        $peppered = hash_hmac("sha256", $this->password, $pepper);
+            
+        $options = [
+            "memory_cost" => 1 << 17, // 128 MB
+            "time_cost" => 4,
+            "threads" => 2
+        ];
+
+        $this->password = password_hash($peppered, PASSWORD_ARGON2ID, $options);
     }
 
-    // Generar un token
-    public function createToken() {
-        $this->token = md5(uniqid());
+    public static function verifyPassword(string $input, string $hash): bool {
+        $pepper = PEPPER;
+        $peppered = hash_hmac("sha256", $input, $pepper);
+        return password_verify($peppered, $hash);
     }
-
 }
