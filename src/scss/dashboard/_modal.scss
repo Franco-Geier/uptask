@@ -1,0 +1,66 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+
+.modal {
+    position: absolute;
+    background-color: rgb(0 0 0 /.8);
+    inset: 0;
+
+    .form {
+        max-width: 60rem;
+        background-color: v.$white;
+        padding: 2rem;
+        margin: 0 auto;
+        transform: translateY(-30rem);
+        transition: transform .5s, opacity .5s;
+        opacity: 0;
+        border-radius: 1rem;
+
+        legend {
+            text-align: center;
+            font-weight: bold;
+            font-size: clamp(1.6rem, 0.455vw + 1.455rem, 2rem);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .field {
+            justify-content: center;
+        }
+        
+        .options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+
+            @include m.tablet {
+                justify-content: space-between;
+            }
+
+            button,
+            input {
+                font-size: clamp(1.4rem, 0.227vw + 1.327rem, 1.6rem);
+                padding: clamp(1rem, 0.568vw + 0.818rem, 1.5rem) clamp(3.5rem, 0.568vw + 3.318rem, 4rem);
+            }
+        }
+
+        .submit-new-task {
+            @include m.button(v.$indigo, v.$white);
+        }
+
+        .close-modal {
+            @include m.button(v.$orange, v.$white);
+        }
+
+        &.animate {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 1;
+        }
+        &.close {
+            transform: translateY(-320%);
+            opacity: 0;
+        }
+    }
+}

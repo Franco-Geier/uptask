@@ -18,6 +18,9 @@
 
         .page-name {
             text-align: center;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            white-space: normal;
             font-size: clamp(2.5rem, 0.341vw + 2.391rem, 2.8rem);
         }
     }
