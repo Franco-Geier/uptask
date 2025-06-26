@@ -5,7 +5,7 @@
 
     function showForm() {
         const modal = createModal();
-        document.body.appendChild(modal); // Lo agrega al Body
+        document.querySelector(".dashboard").appendChild(modal); // Lo agrega al dashboard
         document.querySelector("#task").focus(); // Focus para el input
     
         const handleEscape = (e) => { //Arrow function si el usuario presiona ESC
@@ -24,6 +24,7 @@
                 <div class="field">
                     <label for="task">Tarea</label>
                     <input
+                        class="input-task"
                         type="text"
                         name="task"
                         placeholder="Añadir Tarea al Proyecto Actual"
@@ -55,6 +56,12 @@
                 closeModal(modal);
             }
         });
+
+        modal.querySelector("form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            submitFormNewTask();
+        });
+
         return modal;
     }
 
@@ -69,7 +76,90 @@
             }
         }, 390);
     }
+
+    function submitFormNewTask() {
+        const task = document.querySelector("#task").value.trim();
+        if(task === "") {
+            showAlert("El Nombre de la Tarea es Obligatorio", "error", document.querySelector(".form legend"));
+            return;
+        }
+        
+        if (task.length > 60) {
+            showAlert("El Nombre de la Tarea debe tener como máximo 60 caracteres", "error", document.querySelector(".form legend"));
+            return;
+        }
+        addTask(task);
+    }
+
+    // Muesra un mensaje en la interfaz
+    function showAlert(message, type, reference) {
+        const previousAlert = document.querySelector(".alert"); // Previene la creacion de multiples alertas
+        if(previousAlert) {
+            previousAlert.remove();
+        }
+
+        const alertWrapper = document.createElement("DIV");
+        alertWrapper.classList.add("alert", type);
+        
+        const alert = document.createElement("P");
+        alert.textContent = message;
+        alertWrapper.appendChild(alert);
+        reference.insertAdjacentElement("afterend", alertWrapper);        
+        
+        setTimeout(() => alertWrapper.remove(), 5000); // Eliminar la alerta despues de 5 segundos
+    }
+
+    // Consultar el servidor para añadir una nueva tarea al proyecto actual
+    async function addTask(task) {
+        const data = new FormData(); // Construir peticion
+        data.append("name", task);
+        data.append("projectId", getProject());
+
+        const submitBtn = document.querySelector(".submit-new-task");
+        submitBtn.disabled = true;
+        submitBtn.value = "Añadiendo...";
+        submitBtn.classList.add("disabled"); // Agrega clase visual
+
+        try {
+            const url = "http://localhost:3000/api/task"; // Url a la cual va la peticion
+            const response = await fetch(url, { // Objeto con la configuracion de la peticion
+                method: "POST",
+                body: data
+            });
+            
+            const result = await response.json();
+            showAlert(result.message, result.type, document.querySelector(".form legend"));
+
+            if(result.type === "exito") {
+                // Limpiar el campo de texto
+                document.querySelector("#task").value = "";
+
+                // Reactivar el botón para poder seguir agregando
+                submitBtn.disabled = false;
+                submitBtn.value = "Añadir Tarea";
+                submitBtn.classList.remove("disabled");
+            } else {
+                // Si hubo un error del backend, reactivar el botón
+                submitBtn.disabled = false;
+                submitBtn.value = "Añadir Tarea";
+            }
+        } catch(error) {
+            console.error(error);
+            submitBtn.disabled = false;
+            submitBtn.value = "Añadir Tarea";
+            submitBtn.classList.remove("disabled");
+        }
+    }
+
+    function getProject() {
+        const params = new URLSearchParams(window.location.search); // Obtenemos el query string
+        const entries = Object.fromEntries(params.entries()); // Nos trae los datos del objeto projectParams
+        return entries.url;
+    }
     
+
+
+
     // function showForm() {
     //     const modal = document.createElement("DIV");
     //     modal.classList.add("modal");

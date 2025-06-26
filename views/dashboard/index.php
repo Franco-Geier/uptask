@@ -1,8 +1,7 @@
 <?php include_once __DIR__ . "/dashboard-header.php"; ?>
 
     <?php if(count($projects) === 0) { ?>
-        <p class="no-projects">No hay proyectos aún</p>
-        <a href="/create-project">Comienza creando uno</a>
+        <p class="no-projects">No hay proyectos aún. <a href="/create-project">Comienza creando uno</a></p>
     <?php }  else { ?>
         <ul class="project-list">
             <?php foreach($projects as $project) { ?>

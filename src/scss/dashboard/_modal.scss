@@ -1,5 +1,6 @@
 @use 'base/variables' as v;
 @use 'base/mixins' as m;
+@use "sass:color";
 
 .modal {
     position: absolute;
@@ -15,6 +16,12 @@
         transition: transform .5s, opacity .5s;
         opacity: 0;
         border-radius: 1rem;
+            
+        &.new-task {
+            .input-task {
+                background-color: color.adjust(v.$gray, $lightness: 40%);
+            }
+        }
 
         legend {
             text-align: center;
@@ -27,7 +34,7 @@
         .field {
             justify-content: center;
         }
-        
+
         .options {
             display: flex;
             gap: 1rem;
@@ -41,11 +48,16 @@
             input {
                 font-size: clamp(1.4rem, 0.227vw + 1.327rem, 1.6rem);
                 padding: clamp(1rem, 0.568vw + 0.818rem, 1.5rem) clamp(3.5rem, 0.568vw + 3.318rem, 4rem);
+                text-transform: capitalize;
             }
         }
 
         .submit-new-task {
             @include m.button(v.$indigo, v.$white);
+        }
+        .submit-new-task.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .close-modal {
