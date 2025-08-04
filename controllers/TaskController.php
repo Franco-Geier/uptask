@@ -49,7 +49,8 @@ class TaskController {
                 $response = [
                     "type" => "exito",
                     "id" => $task->id,
-                    "message" => "Tarea creada correctamente"
+                    "message" => "Tarea creada correctamente",
+                    "projectId" => $project->id
                 ];
             } else {
                 $response = [

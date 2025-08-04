@@ -3,6 +3,8 @@
 
     getTasks();
 
+    let tasks = [];
+
     const newTaskBtn = document.querySelector("#add-task"); // Boton para mostrar el modal de agregar tarea
     newTaskBtn.addEventListener("click", showForm);
 
@@ -12,15 +14,16 @@
             const url = `/api/tasks?url=${id}`;
             const response = await fetch(url);
             const result = await response.json();
-            const { tasks } = result;
-            showTasks(tasks);
+            tasks = result.tasks;
+            showTasks();
 
         } catch(error) {
             console.error(error);
         }
     }
 
-    function showTasks(tasks) {
+    function showTasks() {
+        cleanTasks();
         if(tasks.length === 0) {
             const tasksContainer = document.querySelector("#tasks-list");
             
@@ -202,6 +205,17 @@
                 // Limpiar el campo de texto
                 document.querySelector("#task").value = "";
 
+                // Agregar el objeto de tarea al global de tareas
+                const taskObj = {
+                    id: result.id,
+                    name: task,
+                    state: 0,
+                    projectId: result.projectId
+                }
+                
+                tasks = [...tasks, taskObj];
+                showTasks();
+
                 // Reactivar el botón para poder seguir agregando
                 submitBtn.disabled = false;
                 submitBtn.value = "Añadir Tarea";
@@ -223,5 +237,12 @@
         const params = new URLSearchParams(window.location.search); // Obtenemos el query string
         const entries = Object.fromEntries(params.entries()); // Nos trae los datos del objeto projectParams
         return entries.url;
-    }    
+    }
+
+    function cleanTasks() {
+        const listTasks = document.querySelector("#tasks-list");
+        while(listTasks.firstChild) {
+            listTasks.removeChild(listTasks.firstChild);
+        }
+    }
 })();
