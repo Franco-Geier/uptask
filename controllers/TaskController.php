@@ -7,7 +7,22 @@ use Model\Task;
 
 class TaskController {
     public static function index() {
+        $projectUrl = $_GET["url"];
+        if(!$projectUrl) {
+            header("Location: /dashboard");
+        }
+        $project = Project::where("url", $projectUrl);
+        session_start();
 
+        if(!$project || $project->ownerId !== $_SESSION["id"]) {
+            header("Location: /404");
+        }
+
+        $tasks = Task::whereAll("projectId", $project->id);
+        
+        echo json_encode(
+            ["tasks" => $tasks]
+        );
     }
 
     public static function create() {

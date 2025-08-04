@@ -11,8 +11,17 @@
 
     .main {
         flex: 1;
+        overflow: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: thin; // Firefox
+        &::-webkit-scrollbar {
+            width: 8px; // Chrome, Safari
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: v.$indigo;
+            border-radius: 4px;
+        }
     }
-
     .content {
         padding: 2rem;
 

@@ -1,7 +1,75 @@
 // IIFE
 (function() {
+
+    getTasks();
+
     const newTaskBtn = document.querySelector("#add-task"); // Boton para mostrar el modal de agregar tarea
     newTaskBtn.addEventListener("click", showForm);
+
+    async function getTasks() {
+        try {
+            const id = getProject();
+            const url = `/api/tasks?url=${id}`;
+            const response = await fetch(url);
+            const result = await response.json();
+            const { tasks } = result;
+            showTasks(tasks);
+
+        } catch(error) {
+            console.error(error);
+        }
+    }
+
+    function showTasks(tasks) {
+        if(tasks.length === 0) {
+            const tasksContainer = document.querySelector("#tasks-list");
+            
+            const noTasksText = document.createElement("LI");
+            noTasksText.textContent = "No hay tareas";
+            noTasksText.classList.add("no-tasks");
+
+            tasksContainer.appendChild(noTasksText);
+            return;
+        }
+
+        const states = {
+            0: "Pendiente",
+            1: "Completa"
+        };
+
+        tasks.forEach(task => {
+            const taskContainer = document.createElement("LI");
+            taskContainer.dataset.taskId = task.id;
+            taskContainer.classList.add("task");
+
+            const taskName = document.createElement("P");
+            taskName.textContent = task.name;
+            
+            const optionsDiv = document.createElement("DIV");
+            optionsDiv.classList.add("options");
+
+            // Botones
+            const btnTaskState = document.createElement("BUTTON");
+            btnTaskState.classList.add("task-state");
+            btnTaskState.classList.add(`${states[task.state].toLowerCase()}`);
+            btnTaskState.textContent = states[task.state];
+            btnTaskState.dataset.taskState = task.state;
+
+            const btnDeleteTask = document.createElement("BUTTON");
+            btnDeleteTask.classList.add("delete-task");
+            btnDeleteTask.dataset.taskId = task.id;
+            btnDeleteTask.textContent = "Eliminar";
+
+            optionsDiv.appendChild(btnTaskState);
+            optionsDiv.appendChild(btnDeleteTask);
+
+            taskContainer.appendChild(taskName);
+            taskContainer.appendChild(optionsDiv);
+
+            const tasksList = document.querySelector("#tasks-list");
+            tasksList.appendChild(taskContainer);
+        });
+    }
 
     function showForm() {
         const modal = createModal();
@@ -155,72 +223,5 @@
         const params = new URLSearchParams(window.location.search); // Obtenemos el query string
         const entries = Object.fromEntries(params.entries()); // Nos trae los datos del objeto projectParams
         return entries.url;
-    }
-    
-
-
-
-    // function showForm() {
-    //     const modal = document.createElement("DIV");
-    //     modal.classList.add("modal");
-
-    //     modal.innerHTML = `
-    //         <form class="form new-task container">
-    //             <legend>Añade una nueva tarea</legend>
-    //             <div class="field">
-    //                 <label>Tarea</label>
-    //                 <input
-    //                     type="text"
-    //                     name="task"
-    //                     placeholder="Añadir Tarea al Proyecto Actual"
-    //                     id="task"
-    //                 >
-    //             </div>
-
-    //             <div class="options">
-    //                 <input
-    //                     type="submit"
-    //                     class="submit-new-task"
-    //                     value="Añadir Tarea"
-    //                 >
-    //                 <button type="button" class="close-modal">Cancelar</button>
-    //             </div>
-    //         </form>
-    //     `;
-
-    //     setTimeout(() => {
-    //         const form = document.querySelector(".form");
-    //         form.classList.add("animate");
-    //     }, 0);
-
-    //     modal.addEventListener("click", function(e) {
-    //         e.preventDefault();
-
-    //         if(e.target.classList.contains("close-modal") || e.target.classList.contains("modal")) {
-    //             const form = document.querySelector(".form");
-    //             form.classList.add("close");
-
-    //             setTimeout(() => {
-    //                 modal.remove();
-    //             }, 390);
-    //         }
-    //     })
-
-    //     document.querySelector("body").appendChild(modal);
-    //     document.querySelector("#task").focus();
-
-    //     document.addEventListener("keydown", handleEscape);
-
-    //     function handleEscape(e) {
-    //         if (e.key === "Escape") {
-    //             const form = document.querySelector(".form");
-    //             form.classList.add("close");
-    //             setTimeout(() => {
-    //                 modal.remove();
-    //                 document.removeEventListener("keydown", handleEscape); // Limpieza
-    //             }, 390);
-    //         }
-    //     }
-    // }
-    
+    }    
 })();

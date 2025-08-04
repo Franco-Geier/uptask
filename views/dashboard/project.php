@@ -4,6 +4,8 @@
             <button type="button" class="add-task" id="add-task">&#43; Nueva Tarea</button>
         </div>
     </div>
+
+    <ul id="tasks-list" class="tasks-list"></ul>
 <?php include_once __DIR__ . "/dashboard-footer.php"; ?>
 
 <?php $script = '<script src="build/js/bundle.min.js"></script>'; ?>

@@ -1,5 +1,6 @@
 @use 'base/variables' as v;
 @use 'base/mixins' as m;
+@use 'sass:color';
 
 .container-new-task {
     display: flex;
@@ -9,6 +10,63 @@
         @include m.button(v.$cyan, v.$white);
         & {
             font-size: clamp(1.2rem, 0.341vw + 1.091rem, 1.5rem);
+        }
+    }
+}
+
+.tasks-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 2.5rem;
+
+    .no-tasks {
+        text-align: center;
+        
+    }
+}
+
+.task {
+    padding: .5rem 2rem;
+    border-bottom: 2px solid color.adjust(v.$lightGray, $lightness: -5%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:last-of-type {
+        border: none;
+    }
+
+    p {
+        font-size: clamp(1.3rem, 0.227vw + 1.227rem, 1.5rem);
+    }
+
+    .options {
+        display: flex;
+        gap: 1rem;
+
+        button {
+            border: none;
+            font-size: clamp(1rem, 0.227vw + 0.927rem, 1.2rem);
+            padding: .5rem 1rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 1rem;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+        .completa {
+            background-color: v.$blue;
+            color: v.$white;
+        }
+        .pendiente {
+            background-color: v.$orange;
+            color: v.$white;
+        }
+        .delete-task {
+            background-color: v.$red;
+            color: v.$white;
         }
     }
 }

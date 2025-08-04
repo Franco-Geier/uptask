@@ -16,7 +16,7 @@ class Project extends ActiveRecord {
     public function __construct($args = []) {
         $this->id = $args["id"] ?? null;
         $this->project = $args["project"] ?? "";
-        $this->url = $args["id"] ?? "";
+        $this->url = $args["url"] ?? "";
         $this->ownerId = $args["ownerId"] ?? null;
     }
 
