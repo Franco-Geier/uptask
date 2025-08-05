@@ -57,6 +57,9 @@
             btnTaskState.classList.add(`${states[task.state].toLowerCase()}`);
             btnTaskState.textContent = states[task.state];
             btnTaskState.dataset.taskState = task.state;
+            btnTaskState.ondblclick = function() {
+                changeTaskState({...task});
+            }
 
             const btnDeleteTask = document.createElement("BUTTON");
             btnDeleteTask.classList.add("delete-task");
@@ -230,6 +233,46 @@
             submitBtn.disabled = false;
             submitBtn.value = "Añadir Tarea";
             submitBtn.classList.remove("disabled");
+        }
+    }
+
+    function changeTaskState(task) {
+        const newState = task.state === 1 ? 0 : 1;
+        task.state = newState;
+        updateTask(task);
+    }
+
+    async function updateTask(task) {
+        const {id, name, projectId, state} = task;
+        const data = new FormData();
+
+        data.append("id", id);
+        data.append("name", name);
+        data.append("projectId", getProject());
+        data.append("state", state);
+
+        try {
+            const url = "http://localhost:3000/api/task/update";
+            const response = await fetch(url, {
+                method: "POST",
+                body: data
+            });
+            const result = await response.json();
+            
+            if(result.response.type === "exito") {
+                showAlert(result.response.message, result.response.type,
+                          document.querySelector(".container-new-task"));
+            }
+
+            tasks = tasks.map(memoryTask => {
+                if(memoryTask.id === id) {
+                    memoryTask.state = state;
+                } 
+                return memoryTask;
+            });
+            showTasks();
+        } catch (error) {
+            console.error(error);
         }
     }
 
