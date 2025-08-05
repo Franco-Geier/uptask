@@ -65,6 +65,9 @@
             btnDeleteTask.classList.add("delete-task");
             btnDeleteTask.dataset.taskId = task.id;
             btnDeleteTask.textContent = "Eliminar";
+            btnDeleteTask.ondblclick = function() {
+                confirmDeleteTask({...task});
+            }
 
             optionsDiv.appendChild(btnTaskState);
             optionsDiv.appendChild(btnDeleteTask);
@@ -276,6 +279,53 @@
         }
     }
 
+    function confirmDeleteTask(task) {
+        Swal.fire({
+            title: "¿Eliminar Tarea?",
+            showCancelButton: true,
+            confirmButtonText: "Si",
+            cancelButtonText: "No"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteTask(task);
+            }
+        });
+    }
+
+    async function deleteTask(task) {
+        const {id, name, state} = task;
+        const data = new FormData();
+
+        data.append("id", id);
+        data.append("name", name);
+        data.append("projectId", getProject());
+        data.append("state", state);
+
+        try {
+            const url = "http://localhost:3000/api/task/delete";
+            const response = await fetch(url, {
+                method: "POST",
+                body: data
+            });
+            const result = await response.json();
+
+            if(result.result) {
+                // showAlert(
+                //     result.message,
+                //     result.type,
+                //     document.querySelector(".container-new-task")
+                // );
+
+                Swal.fire("¡Eliminado!", result.message, "success");
+
+                tasks = tasks.filter(memoryTask => memoryTask.id !== task.id);
+                showTasks();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
     function getProject() {
         const params = new URLSearchParams(window.location.search); // Obtenemos el query string
         const entries = Object.fromEntries(params.entries()); // Nos trae los datos del objeto projectParams
