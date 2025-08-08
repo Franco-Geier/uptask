@@ -6,7 +6,9 @@
     let tasks = [];
 
     const newTaskBtn = document.querySelector("#add-task"); // Boton para mostrar el modal de agregar tarea
-    newTaskBtn.addEventListener("click", showForm);
+    newTaskBtn.addEventListener("click", function() {
+        showForm();
+    });
 
     async function getTasks() {
         try {
@@ -47,6 +49,9 @@
 
             const taskName = document.createElement("P");
             taskName.textContent = task.name;
+            taskName.ondblclick = function() {
+                showForm(true, {...task});
+            }
             
             const optionsDiv = document.createElement("DIV");
             optionsDiv.classList.add("options");
@@ -80,8 +85,8 @@
         });
     }
 
-    function showForm() {
-        const modal = createModal();
+    function showForm(edit = false, task = {}) {
+        const modal = createModal(edit, task);
         document.querySelector(".dashboard").appendChild(modal); // Lo agrega al dashboard
         document.querySelector("#task").focus(); // Focus para el input
     
@@ -91,21 +96,22 @@
         document.addEventListener("keydown", handleEscape);
     }
 
-    function createModal() {
+    function createModal(edit, task) {
         const modal = document.createElement("DIV");
         modal.classList.add("modal");
 
         modal.innerHTML = `
             <form class="form new-task container">
-                <legend>Añade una nueva tarea</legend>
+                <legend>${edit ? 'Editar tarea' : 'Añade una nueva tarea'}</legend>
                 <div class="field">
                     <label for="task">Tarea</label>
                     <input
                         class="input-task"
                         type="text"
                         name="task"
-                        placeholder="Añadir Tarea al Proyecto Actual"
+                        placeholder="${task.name ? 'Edita la Tarea' : 'Añadir Tarea al Proyecto Actual'}"
                         id="task"
+                        value="${task.name ? task.name : ''}"
                     >
                 </div>
 
@@ -113,7 +119,7 @@
                     <input
                         type="submit"
                         class="submit-new-task"
-                        value="Añadir Tarea"
+                        value="${edit ? 'Guardar Cambios' : 'Añadir Tarea'}"
                     >
                     <button type="button" class="close-modal">Cancelar</button>
                 </div>
@@ -136,9 +142,24 @@
 
         modal.querySelector("form").addEventListener("submit", function(e) {
             e.preventDefault();
-            submitFormNewTask();
-        });
+            const taskName = document.querySelector("#task").value.trim();
+            if(taskName === "") {
+                showAlert("El Nombre de la Tarea es Obligatorio", "error", document.querySelector(".form legend"));
+                return;
+            }
+            
+            if(taskName.length > 60) {
+                showAlert("El Nombre de la Tarea debe tener como máximo 60 caracteres", "error", document.querySelector(".form legend"));
+                return;
+            }
 
+            if(edit) {
+                task.name = taskName
+                updateTask(task);
+            } else {
+                addTask(taskName);
+            }
+        });
         return modal;
     }
 
@@ -152,20 +173,6 @@
                 document.removeEventListener("keydown", escListener);
             }
         }, 390);
-    }
-
-    function submitFormNewTask() {
-        const task = document.querySelector("#task").value.trim();
-        if(task === "") {
-            showAlert("El Nombre de la Tarea es Obligatorio", "error", document.querySelector(".form legend"));
-            return;
-        }
-        
-        if (task.length > 60) {
-            showAlert("El Nombre de la Tarea debe tener como máximo 60 caracteres", "error", document.querySelector(".form legend"));
-            return;
-        }
-        addTask(task);
     }
 
     // Muesra un mensaje en la interfaz
@@ -263,17 +270,26 @@
             const result = await response.json();
             
             if(result.response.type === "exito") {
-                showAlert(result.response.message, result.response.type,
-                          document.querySelector(".container-new-task"));
-            }
+                Swal.fire(
+                    result.response.message,
+                    result.response.message,
+                    "success"
+                );
+                const modal = document.querySelector(".modal");
+                
+                if(modal) {
+                    modal.remove();
+                }
 
-            tasks = tasks.map(memoryTask => {
-                if(memoryTask.id === id) {
-                    memoryTask.state = state;
-                } 
-                return memoryTask;
-            });
-            showTasks();
+                tasks = tasks.map(memoryTask => {
+                    if(memoryTask.id === id) {
+                        memoryTask.state = state;
+                        memoryTask.name = name;
+                    } 
+                    return memoryTask;
+                });
+                showTasks();
+            }
         } catch (error) {
             console.error(error);
         }
@@ -281,6 +297,7 @@
 
     function confirmDeleteTask(task) {
         Swal.fire({
+            icon: "warning",
             title: "¿Eliminar Tarea?",
             showCancelButton: true,
             confirmButtonText: "Si",
@@ -310,14 +327,8 @@
             const result = await response.json();
 
             if(result.result) {
-                // showAlert(
-                //     result.message,
-                //     result.type,
-                //     document.querySelector(".container-new-task")
-                // );
-
                 Swal.fire("¡Eliminado!", result.message, "success");
-
+                icon: "success"
                 tasks = tasks.filter(memoryTask => memoryTask.id !== task.id);
                 showTasks();
             }
