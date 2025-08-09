@@ -21,7 +21,6 @@
 
     .no-tasks {
         text-align: center;
-        
     }
 }
 
@@ -38,6 +37,10 @@
 
     p {
         font-size: clamp(1.3rem, 0.227vw + 1.227rem, 1.5rem);
+        overflow-wrap: anywhere;
+        padding-right: 2rem;
+        white-space: normal;
+        word-break: break-word;
     }
 
     .options {

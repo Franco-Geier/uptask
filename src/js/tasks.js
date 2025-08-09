@@ -4,11 +4,35 @@
     getTasks();
 
     let tasks = [];
+    let filtred = [];
+    let currentFilter = ""; // guarda filtro activo
+
+    getTasks();
 
     const newTaskBtn = document.querySelector("#add-task"); // Boton para mostrar el modal de agregar tarea
     newTaskBtn.addEventListener("click", function() {
         showForm();
     });
+
+    // Filtros de búsqueda
+    const filters = document.querySelectorAll('#filters input[type="radio"]');
+    filters.forEach(radio => {
+        radio.addEventListener("input", filterTasks);
+    })
+
+    function filterTasks(e) {
+        currentFilter = e.target.value; // guarda filtro actual
+        applyFilter();
+        showTasks();
+    }
+
+    function applyFilter() {
+        if (currentFilter !== "") {
+            filtred = tasks.filter(task => task.state === parseInt(currentFilter));
+        } else {
+            filtred = [];
+        }
+    }
 
     async function getTasks() {
         try {
@@ -17,6 +41,7 @@
             const response = await fetch(url);
             const result = await response.json();
             tasks = result.tasks;
+            applyFilter();
             showTasks();
 
         } catch(error) {
@@ -26,7 +51,12 @@
 
     function showTasks() {
         cleanTasks();
-        if(tasks.length === 0) {
+        toggleFilterDisabled(0, "#pending");
+        toggleFilterDisabled(1, "#completed");
+
+        const arrayTasks = filtred.length || currentFilter !== "" ? filtred : tasks;
+
+        if(arrayTasks.length === 0) {
             const tasksContainer = document.querySelector("#tasks-list");
             
             const noTasksText = document.createElement("LI");
@@ -42,7 +72,7 @@
             1: "Completa"
         };
 
-        tasks.forEach(task => {
+        arrayTasks.forEach(task => {
             const taskContainer = document.createElement("LI");
             taskContainer.dataset.taskId = task.id;
             taskContainer.classList.add("task");
@@ -83,6 +113,12 @@
             const tasksList = document.querySelector("#tasks-list");
             tasksList.appendChild(taskContainer);
         });
+    }
+
+    function toggleFilterDisabled(state, selector) {
+        const total = tasks.filter(task => task.state === state);
+        const radio = document.querySelector(selector);
+        radio.disabled = total.length === 0;
     }
 
     function showForm(edit = false, task = {}) {
@@ -160,6 +196,11 @@
                 addTask(taskName);
             }
         });
+
+        const input = modal.querySelector("#task");
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+        
         return modal;
     }
 
@@ -253,7 +294,7 @@
     }
 
     async function updateTask(task) {
-        const {id, name, projectId, state} = task;
+        const {id, name, state} = task;
         const data = new FormData();
 
         data.append("id", id);
@@ -281,13 +322,8 @@
                     modal.remove();
                 }
 
-                tasks = tasks.map(memoryTask => {
-                    if(memoryTask.id === id) {
-                        memoryTask.state = state;
-                        memoryTask.name = name;
-                    } 
-                    return memoryTask;
-                });
+                tasks = tasks.map(memoryTask => memoryTask.id === id ? {...memoryTask, state, name} : memoryTask);
+                applyFilter();
                 showTasks();
             }
         } catch (error) {
@@ -328,8 +364,8 @@
 
             if(result.result) {
                 Swal.fire("¡Eliminado!", result.message, "success");
-                icon: "success"
-                tasks = tasks.filter(memoryTask => memoryTask.id !== task.id);
+                tasks = tasks.filter(memoryTask => memoryTask.id !== id);
+                applyFilter();
                 showTasks();
             }
         } catch (error) {
