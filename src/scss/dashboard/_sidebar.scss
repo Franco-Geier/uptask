@@ -3,20 +3,72 @@
 @use "sass:color";
 
 .sidebar {
+    opacity: 0;
     background-color: v.$indigo;
-    padding: 2rem;
+    height: 0;
+    overflow: hidden;
+    transition: opacity .5s;
+    @include m.tablet {
+        position: static;
+        height: 100%;
+        opacity: 1;
+        padding: 2rem;
+        background-color: v.$indigo;
+    }
 
-    h2 {
-        color: v.$white;
-        margin: 0;
-        text-align: center;
+    &.show {
+        padding: 2rem;
+        opacity: 1;
+        position: fixed;
+        inset: 0;
+        background-color: rgb(0 0 0 / .90);
+        height: 100dvh;
+        z-index: 999;
+        @include m.tablet {
+            display: none;
+        }
+    }
+
+    &.hide {
+        opacity: 0;
+    }
+
+    .sidebar-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h2 {
+            color: v.$white;
+            margin: 0;
+            text-align: center;
+        }
+
+        .close-menu {
+            display: flex;
+            justify-content: center;
+
+            img {
+                height: 2rem;
+                width: 2rem;
+                &:hover {
+                    cursor: pointer;
+                }   
+            }
+            @include m.tablet {
+                display: none;
+            }
+        }
     }
 
     .sidebar-nav {
         display: flex;
         flex-direction: column;
         margin-top: 4.5rem;
-        gap: 1rem;
+        gap: 2rem;
+        @include m.tablet {
+            gap: 1rem;
+        }
 
         a {
             color: v.$white;
@@ -24,13 +76,29 @@
             transition: background-color .3s;
             text-transform: uppercase;
             font-weight: bold;
-            font-size: clamp(1.3rem, 0.227vw + 1.227rem, 1.5rem);
+            font-size: clamp(2rem, 0.671vw + 1.785rem, 2.3rem);
+            text-align: center;
 
             &:hover,
             &.active {
                 background-color: color.adjust(v.$indigo, $lightness: -20%);
                 border-radius: .5rem;
             }
+            @include m.tablet{
+                font-size: clamp(1.3rem, 0.463vw + 0.944rem, 1.5rem);
+                text-align: left;
+            }
+        }
+    }
+
+    .mobile-singout {
+        margin-top: 10rem;
+        @include m.tablet {
+            display: none;
+        }
+
+        .singout {
+            @include m.button(v.$indigo, v.$white);
         }
     }
 }

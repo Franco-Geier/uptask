@@ -38,13 +38,33 @@ function css() {
         .pipe(dest("./public/build/css")); // Almacenar en la carpeta build
 }
 
-function javascript() {
-    return src(paths.js)
+// function javascript() {
+//     return src(paths.js)
+//         .pipe(sourcemaps.init())
+//         .pipe(concat("bundle.js"))
+//         .pipe(terser())
+//         .pipe(sourcemaps.write("."))
+//         .pipe(rename({ suffix: ".min" }))
+//         .pipe(dest("./public/build/js"));
+// }
+
+function javascriptApp() {
+    return src("src/js/app.js")
         .pipe(sourcemaps.init())
-        .pipe(concat("bundle.js"))
+        .pipe(concat("app.js"))
         .pipe(terser())
-        .pipe(sourcemaps.write("."))
         .pipe(rename({ suffix: ".min" }))
+        .pipe(sourcemaps.write("."))
+        .pipe(dest("./public/build/js"));
+}
+
+function javascriptTasks() {
+    return src("src/js/tasks.js")
+        .pipe(sourcemaps.init())
+        .pipe(concat("tasks.js"))
+        .pipe(terser())
+        .pipe(rename({ suffix: ".min" }))
+        .pipe(sourcemaps.write("."))
         .pipe(dest("./public/build/js"));
 }
 
@@ -77,16 +97,20 @@ function handleError(error) {
     this.emit('end');  // Permite que Gulp continúe
 }
 
-function dev() {
-    watch(paths.scss, css); // Escucha por los cambios
-    watch(paths.js, javascript); // Escucha por los cambios
+function dev() { // Escucha por los cambios
+    watch(paths.scss, css);
+    watch("src/js/app.js", javascriptApp);
+    watch("src/js/tasks.js", javascriptTasks);
+    // watch(paths.js, javascript);
 }
 
 const processImages = parallel(images, webpVersion, avifVersion);
-const devTasks = series(css, javascript, dev);
+const devTasks = series(css, parallel(javascriptApp, javascriptTasks), dev);
 
 export { css };
-export { javascript as js };
+export { javascriptApp };
+export { javascriptTasks };
+// export { javascript as js };
 export { images };
 export { webpVersion };
 export { avifVersion };
