@@ -3,9 +3,11 @@
 @use "sass:color";
 
 .modal {
-    position: absolute;
-    background-color: rgb(0 0 0 /.8);
+    // position: absolute;
+    background-color: rgb(0 0 0 / .90);
     inset: 0;
+    position: fixed;
+    height: 100dvh;
 
     .form {
         max-width: 60rem;
@@ -39,9 +41,11 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
+            flex-direction: column;
 
             @include m.tablet {
                 justify-content: space-between;
+                flex-direction: row;
             }
 
             button,

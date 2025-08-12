@@ -58,15 +58,13 @@
 
         if(arrayTasks.length === 0) {
             const tasksContainer = document.querySelector("#tasks-list");
-            
             const noTasksText = document.createElement("LI");
             noTasksText.textContent = "No hay tareas";
             noTasksText.classList.add("no-tasks");
-
             tasksContainer.appendChild(noTasksText);
             return;
         }
-
+        
         const states = {
             0: "Pendiente",
             1: "Completa"
@@ -79,28 +77,29 @@
 
             const taskName = document.createElement("P");
             taskName.textContent = task.name;
-            taskName.ondblclick = function() {
+            taskName.onclick = function() {
                 showForm(true, {...task});
             }
             
             const optionsDiv = document.createElement("DIV");
             optionsDiv.classList.add("options");
 
-            // Botones
+            // Boton cambiar de estado
             const btnTaskState = document.createElement("BUTTON");
             btnTaskState.classList.add("task-state");
             btnTaskState.classList.add(`${states[task.state].toLowerCase()}`);
             btnTaskState.textContent = states[task.state];
             btnTaskState.dataset.taskState = task.state;
-            btnTaskState.ondblclick = function() {
+            btnTaskState.onclick = function() {
                 changeTaskState({...task});
             }
 
+            // Boton eliminar
             const btnDeleteTask = document.createElement("BUTTON");
             btnDeleteTask.classList.add("delete-task");
             btnDeleteTask.dataset.taskId = task.id;
             btnDeleteTask.textContent = "Eliminar";
-            btnDeleteTask.ondblclick = function() {
+            btnDeleteTask.onclick = function() {
                 confirmDeleteTask({...task});
             }
 
@@ -126,6 +125,9 @@
         document.querySelector(".dashboard").appendChild(modal); // Lo agrega al dashboard
         document.querySelector("#task").focus(); // Focus para el input
     
+        // Bloquear scroll SIEMPRE
+        document.body.style.overflow = "hidden";
+
         const handleEscape = (e) => { //Arrow function si el usuario presiona ESC
             if(e.key === "Escape") closeModal(modal, handleEscape);
         };
@@ -210,6 +212,8 @@
 
         setTimeout(() => {
             modal.remove();
+            // Restaurar scroll
+            document.body.style.overflow = "";
             if(escListener) {
                 document.removeEventListener("keydown", escListener);
             }
