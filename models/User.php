@@ -59,13 +59,7 @@ class User extends ActiveRecord {
         }
     }
 
-    protected function validateLoginLogic(): void {
-        $this->validateEmailLogic();
-        $this->validatePasswordRequired();
-    }
-
-    // Validación para cuentas nuevas
-    public function validateNewAccount() {
+    protected function validateNameLogic(): void {
         if(!$this->name) {
             self::$alerts["error"][] = "El nombre del usuario es obligatorio";
         } elseif(!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
@@ -73,11 +67,32 @@ class User extends ActiveRecord {
         } elseif(mb_strlen($this->name) > 30) {
             self::$alerts["error"][] = "El nombre debe tener hasta 30 caracteres.";
         }
+    }
 
+    protected function validateLoginLogic(): void {
+        $this->validateEmailLogic();
+        $this->validatePasswordRequired();
+    }
+
+    // Validación para cuentas nuevas
+    public function validateNewAccount() {
+        // if(!$this->name) {
+        //     self::$alerts["error"][] = "El nombre del usuario es obligatorio";
+        // } elseif(!preg_match("/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/", $this->name)) {
+        //     self::$alerts["error"][] = "El nombre solo puede contener letras, números, espacios, apóstrofes y guiones.";
+        // } elseif(mb_strlen($this->name) > 30) {
+        //     self::$alerts["error"][] = "El nombre debe tener hasta 30 caracteres.";
+        // }
+        $this->validateNameLogic();
         $this->validateEmailLogic();
         $this->validatePasswordRequired();
         $this->validatePasswordSecure();
-        
+        return self::$alerts;
+    }
+
+    public function validateEditAccount() {
+        $this->validateNameLogic();
+        $this->validateEmailLogic();
         return self::$alerts;
     }
 

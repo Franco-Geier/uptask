@@ -65,12 +65,41 @@ class DashboardController {
         session_start();
         isAuth();
         $alerts = [];
-
         $user = User::find($_SESSION["id"]);
+
+        if($_SERVER["REQUEST_METHOD"] === "POST") {
+            $user->sincronize($_POST);
+            $alerts = $user->validateEditAccount();
+
+            if(empty($alerts)) {
+                $userExists = User::where("email", $user->email);
+
+                if($userExists && $userExists->id !== $user->id) {
+                    User::setAlert("error", "El Email ya pertenece a otra cuenta");
+                    $alerts = $user->getAlerts();
+                } else {
+                    $user->save();
+                    User::setAlert("exito", "Guardado correctamente");
+                    $alerts = $user->getAlerts();
+                    $_SESSION["name"] = $user->name; // Asignar el nombre nuevo a la barra
+                }
+            }
+        }
         
         $router->render("dashboard/profile", [
             "tittle" => "Perfil",
             "user" => $user,
+            "alerts" => $alerts
+        ]);
+    }
+
+    public static function change_password(Router $router) {
+        session_start();
+        isAuth();
+        $alerts = [];
+
+        $router->render("dashboard/change-password", [
+            "tittle" => "Cambiar Password",
             "alerts" => $alerts
         ]);
     }
