@@ -28,16 +28,19 @@ document.addEventListener("keydown", function(e) {
 
 // Cerrar haciendo click en el overlay
 sidebar.addEventListener("click", function(e) {
-    if (e.target === sidebar) {
+    if (window.innerWidth < 768 && e.target === sidebar) {
         closeSidebar();
     }
 });
 
-// Elimina la clase de show, en un tamaño de tablet y mayores
+// Elimina la clase de show, solo si venimos de mobile
 window.addEventListener("resize", function() {
     const screenWidth = document.body.clientWidth;
     if(screenWidth >= 768) {
-        sidebar.classList.remove("show");
+        if(sidebar.classList.contains("show")) {
+            sidebar.classList.remove("show", "hide");
+            document.body.style.overflow = "";
+        }
     }
 });
 

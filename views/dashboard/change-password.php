@@ -4,20 +4,20 @@
     <?php include_once __DIR__ . "/../templates/alerts.php"; ?>
     <a href="/profile" class="link">Volver a Perfil</a>
 
-    <form action="/profile" class="form" method="POST">
+    <form action="/change-password" class="form" method="POST">
         <div class="field">
-            <label for="password_actual">Password Actual</label>
+            <label for="current_password">Password Actual</label>
             <input
                 type="password"
-                name="password_actual"
+                name="current_password"
                 placeholder="Tu Password Actual">
         </div>
 
         <div class="field">
-            <label for="password_nuevo">Password Nuevo</label>
+            <label for="new_password">Password Nuevo</label>
             <input
                 type="password"
-                name="password_nuevo"
+                name="new_password"
                 placeholder="Tu Password Nuevo">
         </div>
 

@@ -1,0 +1,136 @@
+@use 'base/mixins' as m;
+@use 'base/variables' as v;
+@use "sass:color";
+
+@media(prefers-color-scheme: dark) {
+    $darkGray: #2c2c3b;
+
+    body {
+        background-color: $darkGray;
+    }
+
+    .tagline,
+    .form label,
+    .login .actions a,
+    .create .actions a,
+    .forgot .actions a,
+    .tasks-list .no-tasks {
+        color: v.$white;
+    }
+
+    .page-description,
+    .form .field input,
+    .dashboard .form input:not([type="submit"]),
+    .page-name {
+        color: color.adjust(v.$lightGray, $lightness: -15%);
+    }
+
+    .form .field input {
+        background-color: color.adjust($darkGray, $lightness: 15%);
+        &::placeholder {
+            color: color.adjust(v.$lightGray, $lightness: -30%);
+        }
+    }
+
+    .mobile-bar,
+    .bar  {
+        background-color: color.adjust($darkGray, $lightness: -7%);
+    }
+
+    .bar {
+        p {
+            color: v.$orange;
+        
+            span {
+                color: v.$lightGray;
+            }
+        }
+        .logout {
+            @include m.button(v.$orange, v.$white);
+            border-radius: .5rem;
+            font-size: clamp(1.1rem, .114vw + 1.064rem, 1.2rem);
+            max-width: max-content;
+            padding: 1rem;
+        }
+    }
+
+    .filters {
+        background-color: color.adjust($darkGray, $lightness: 10%);
+    
+        h2,
+        label {
+            color: v.$white;
+        }
+        input[type="radio"] {
+            accent-color: v.$orange;
+        }
+    }
+
+    .alert.error {
+        background-color: v.$white;
+    }
+
+    .sidebar {
+        @include m.tablet {
+            background-color: color.adjust($darkGray, $lightness: -5%);
+        }
+        .sidebar-nav a {
+            &.active,
+            &:hover {
+                background-color: v.$orange;
+            }
+        }
+    }
+
+    .dashboard {
+        background-color: $darkGray;
+        
+        .link {
+            color: v.$lightGray;
+            &:hover {
+                color: color.adjust(v.$lightGray, $lightness: -20%);
+            }
+        }
+        .form input:not([type="submit"]) {
+            background-color: color.adjust($darkGray, $lightness: 20%);
+            color: v.$white;
+            &::placeholder {
+                color: color.adjust(v.$lightGray, $lightness: -30%);
+            }
+        }
+    }
+    
+    .project-list .project {
+        background-color: color.adjust($darkGray, $lightness: 20%);
+        &:hover {
+            background-color: color.adjust($darkGray, $lightness: 15%);
+        }
+    }
+
+    .tasks-list, .task {
+        background-color: color.adjust($darkGray, $lightness: 10%);
+
+        p {
+            color: v.$lightGray;
+        }
+    }
+
+    .modal .form {
+        background-color: $darkGray;
+
+        input[type="text"] {
+            border: none;
+            color: v.$white;
+            &::placeholder {
+                color: color.adjust(v.$lightGray, $lightness: -30%);
+            }
+        }
+        legend {
+            color: v.$lightGray;
+        }
+    }
+
+    .modal .form.new-task .input-task {
+        background-color: color.adjust($darkGray, $lightness: 20%);
+    }
+}

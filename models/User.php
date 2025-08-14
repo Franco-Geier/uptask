@@ -11,6 +11,8 @@ class User extends ActiveRecord {
     public string $email;
     public string $password;
     public string $password2;
+    public string $current_password;
+    public string $new_password;
     public string $token;
     public int $confirmed;
 
@@ -20,6 +22,8 @@ class User extends ActiveRecord {
         $this->email = $args["email"] ?? "";
         $this->password = $args["password"] ?? "";
         $this->password2 = $args["password2"] ?? "";
+        $this->current_password = $args["current_password"] ?? "";
+        $this->new_password = $args["new_password"] ?? "";
         $this->token = $args["token"] ?? "";
         $this->confirmed = isset($args["confirmed"]) ? (int)$args["confirmed"] : 0;
     }
@@ -90,14 +94,14 @@ class User extends ActiveRecord {
         return self::$alerts;
     }
 
-    public function validateEditAccount() {
+    public function validateEditAccount(): array {
         $this->validateNameLogic();
         $this->validateEmailLogic();
         return self::$alerts;
     }
 
     // Valida el login del usuario y retorna un array de alertas
-    public function validateLogin() {
+    public function validateLogin(): array {
         $this->validateLoginLogic();
         return self::$alerts;
     }
@@ -115,7 +119,33 @@ class User extends ActiveRecord {
         return self::$alerts;
     }
 
-    public function hashPassword() {
+    public function new_password(): array {
+        if(!$this->current_password) {
+            self::$alerts["error"][] = "El password actual no puede ir vacío";
+        }
+
+        if(!$this->new_password) {
+            self::$alerts["error"][] = "El password nuevo no puede ir vacío";
+        }
+        if(mb_strlen($this->new_password) < 8 || mb_strlen($this->new_password) > 128) {
+            self::$alerts["error"][] = "El password debe contener entre 8 y 128 caracteres";
+        }
+        if(!preg_match('/[A-Z]/', $this->new_password)) {
+                self::$alerts["error"][] = "El password debe incluir al menos una letra mayúscula";
+        }
+        if(!preg_match('/[a-z]/', $this->new_password)) {
+            self::$alerts["error"][] = "El password debe incluir al menos una letra minúscula";
+        }
+        if(!preg_match('/[0-9]/', $this->new_password)) {
+            self::$alerts["error"][] = "El password debe incluir al menos un número";
+        }
+        if(!preg_match('/[^a-zA-Z0-9]/', $this->new_password)) {
+            self::$alerts["error"][] = "El password debe incluir al menos un carácter especial";
+        }
+        return self::$alerts;
+    }
+
+    public function hashPassword(): void {
         $pepper = PEPPER;
         $peppered = hash_hmac("sha256", $this->password, $pepper);
             
